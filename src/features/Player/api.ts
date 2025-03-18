@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
-import { collection, addDoc, getDocs, doc, updateDoc, getDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, doc, updateDoc, getDoc, deleteDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { Player } from "./types";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const usePlayers = () => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState<boolean>(false);
+  const [deleting, setDeleting] = useState<boolean>(false)
 
   // Fetch players from Firestore
   const fetchPlayers = async () => {
@@ -34,9 +37,10 @@ export const usePlayers = () => {
       const promises = newPlayers.map(({ name, skill }) => addDoc(collection(db, "players"), { name, skill }));
       await Promise.all(promises);
       setPlayers([...players, ...newPlayers]); // Update local state
+      toast.success(`${newPlayers.length} new players saved successfully!`)
     } catch (err) {
       setError("Failed to save players.");
-      console.error("Error saving players:", err);
+      toast.error("Error saving players:");
     } finally {
       setSaving(false);
     }
@@ -69,10 +73,33 @@ export const usePlayers = () => {
         )
       );
 
-      console.log("All players updated successfully!");
+      toast.success(`${updatedPlayers.length} Players updated successfully!`);
     } catch (err) {
       setError("Failed to update players.");
       console.error("Firestore update error:", err);
+    }
+  };
+
+  const deletePlayer = async (playerId: string) => {
+    setDeleting(true);
+    try {
+      const playerRef = doc(db, "players", playerId);
+
+      const docSnap = await getDoc(playerRef);
+      if (!docSnap.exists()) {
+        toast.error(`Player with ID ${playerId} not found!`);
+        return;
+      }
+
+      await deleteDoc(playerRef);
+      setPlayers((prevPlayers) => prevPlayers.filter((p) => p.id !== playerId));
+      toast.success(`Player ${playerId} deleted successfully!`);
+    } catch (err) {
+      setError("Failed to delete player.");
+      toast.error("Error deleting player.");
+      console.error("Error deleting player:", err);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -80,5 +107,5 @@ export const usePlayers = () => {
     fetchPlayers();
   }, []);
 
-  return { players, loading, error, savePlayers, updatePlayers, saving };
+  return { players, loading, error, savePlayers, updatePlayers, saving, deletePlayer, deleting };
 };

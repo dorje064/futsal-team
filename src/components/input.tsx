@@ -1,8 +1,14 @@
 
-export const TextInput = ({ value, onChange }: any) => {
+interface ITextInputProps {
+  value: string,
+  onChange: ({ target }: { target: { value: string } }) => void
+  handleDelete: () => void
+}
+
+export const TextInput = ({ value, onChange, handleDelete }: ITextInputProps) => {
   return (
     <div className="input-group">
-      <span className="input-group-text" id="basic-addon1">X</span>
+      <span className="input-group-text" id="basic-addon1" onClick={handleDelete}>X</span>
       <input
         type="text"
         className="form-control"

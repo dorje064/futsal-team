@@ -3,10 +3,12 @@ import { SkillInput, TextInput } from "../../components/input";
 
 import { usePlayers } from "./api";
 import { Player } from "./types";
+import { ConfirmationModal } from "../../components/confirmationModal";
 
 export const PlayerList = () => {
-  const { players, loading, error, savePlayers, updatePlayers, saving } = usePlayers();
+  const { players, loading, savePlayers, updatePlayers, saving, deletePlayer } = usePlayers();
   const [localPlayers, setLocalPlayers] = useState<Player[]>([]);
+  const [deletingPlayer, setDeletingPlayer] = useState<string | null>()
 
   useEffect(() => {
     players && setLocalPlayers(players)
@@ -42,7 +44,6 @@ export const PlayerList = () => {
   }
 
   if (loading) return <p>Loading players...</p>;
-  if (error) return <p>{error}</p>;
 
   return (
     <div className="px-auto">
@@ -55,6 +56,7 @@ export const PlayerList = () => {
             onChange={({ target }: { target: { value: string } }) =>
               handleChange(player.id, "name", target.value)
             }
+            handleDelete={() => { setDeletingPlayer(player.id) }}
           />
           <SkillInput
             selectedSkill={player.skill}
@@ -76,6 +78,15 @@ export const PlayerList = () => {
       >
         {saving ? "Saving..." : "Save Players"}
       </button>
+
+      <ConfirmationModal
+        isOpen={!!deletingPlayer}
+        onClose={() => setDeletingPlayer(null)}
+        onConfirm={() => {
+          deletePlayer(deletingPlayer as string);
+          setDeletingPlayer(null);
+        }}
+      />
     </div>
   );
 };
