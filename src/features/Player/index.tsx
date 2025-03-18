@@ -15,7 +15,7 @@ export const PlayerList = () => {
     setPlayers([...players, { id: Date.now(), name: '', skill: 0 }]);
   };
 
-  const handleChange = (id, field, value) => {
+  const handleChange = (id: number, field: string, value: string | number) => {
     setPlayers(players.map(player =>
       player.id === id ? { ...player, [field]: value } : player
     ));
