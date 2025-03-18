@@ -22,7 +22,7 @@ export const SkillInput = ({ onSkillSelect, selectedSkill }: any) => {
           key={num}
           onClick={() => onSkillSelect(num)}
           type="button"
-          className="btn btn-outline-secondary"
+          className={`btn ${selectedSkill < num ? 'btn-outline-warning' : 'btn-warning'} `}
         >
           {num}
         </button>
