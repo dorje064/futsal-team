@@ -4,6 +4,7 @@ import { SkillInput, TextInput } from "../../components/input";
 import { usePlayers } from "./api";
 import { Player } from "./types";
 import { ConfirmationModal } from "../../components/confirmationModal";
+import { GlobalNavbar } from "../../components/navbar";
 
 export const PlayerList = () => {
   const { players, loading, savePlayers, updatePlayers, saving, deletePlayer } = usePlayers();
@@ -46,57 +47,61 @@ export const PlayerList = () => {
   if (loading) return <p>Loading players...</p>;
 
   return (
-    <div className='d-flex justify-content-center mb-5'>
-      <h2 className="font-bold text-lg mb-2">Players</h2>
+    <>
+      <div className='d-flex justify-content-center mb-5'>
+        <div>
+          <h2 className="font-bold text-lg mb-2">Players</h2>
 
-      {localPlayers.map((player: Player) => (
-        <div key={player.id} className="btn-toolbar mb-3">
-          <TextInput
-            value={player.name}
-            onChange={({ target }: { target: { value: string } }) =>
-              handleChange(player.id, "name", target.value)
-            }
-            handleDelete={() => { setDeletingPlayer(player.id) }}
-          />
-          <SkillInput
-            selectedSkill={player.skill}
-            onSkillSelect={(number: string) =>
-              handleChange(player.id, "skill", number)
-            }
-          />
+          {localPlayers.map((player: Player) => (
+            <div key={player.id} className="btn-toolbar mb-3">
+              <TextInput
+                value={player.name}
+                onChange={({ target }: { target: { value: string } }) =>
+                  handleChange(player.id, "name", target.value)
+                }
+                handleDelete={() => { setDeletingPlayer(player.id) }}
+              />
+              <SkillInput
+                selectedSkill={player.skill}
+                onSkillSelect={(number: string) =>
+                  handleChange(player.id, "skill", number)
+                }
+              />
+            </div>
+          ))}
+
+          <div className="d-flex">
+            <button
+              type="button"
+              className="btn btn-primary mx-5"
+              onClick={addPlayer}
+            >
+              ({localPlayers.length}) Add Player
+            </button>
+
+            <button
+              type="button"
+              className="btn btn-success"
+              onClick={handleSubmit}
+              disabled={saving}
+            >
+              {saving ? "Saving..." : "Save Players"}
+            </button>
+          </div>
+
+          {deletingPlayer &&
+            <ConfirmationModal
+              show={!!deletePlayer}
+              title="Deleting Player"
+              text="Are you sure to delete the Player ? You can't retrive data once your delete "
+              onClose={() => setDeletingPlayer(null)}
+              onSave={() => {
+                deletePlayer(deletingPlayer as string);
+                setDeletingPlayer(null);
+              }}
+            />}
         </div>
-      ))}
-
-      <div className="d-flex">
-        <button
-          type="button"
-          className="btn btn-primary mx-5"
-          onClick={addPlayer}
-        >
-          ({localPlayers.length}) Add Player
-        </button>
-
-        <button
-          type="button"
-          className="btn btn-success"
-          onClick={handleSubmit}
-          disabled={saving}
-        >
-          {saving ? "Saving..." : "Save Players"}
-        </button>
       </div>
-
-      {deletingPlayer &&
-        <ConfirmationModal
-          show={!!deletePlayer}
-          title="Deleting Player"
-          text="Are you sure to delete the Player ? You can't retrive data once your delete "
-          onClose={() => setDeletingPlayer(null)}
-          onSave={() => {
-            deletePlayer(deletingPlayer as string);
-            setDeletingPlayer(null);
-          }}
-        />}
-    </div>
+    </>
   );
 };

@@ -25,7 +25,7 @@ export const MatchForm = ({ show, saveMatch }: { show: boolean, saveMatch: (data
           </Form.Group>
           <Form.Group
             className="mb-3"          >
-            <Form.Label>Number of Player in Team</Form.Label>
+            <Form.Label>Minimum Number of Player in a Team</Form.Label>
             <Form.Control
               type="number"
               placeholder="5"

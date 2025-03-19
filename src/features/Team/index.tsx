@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Button from 'react-bootstrap/Button'
-import Container from 'react-bootstrap/Container';
-import Navbar from 'react-bootstrap/Navbar';
+import { useNavigate } from "react-router-dom";
+
 
 import { useTeams } from "./api"
 import { Team } from "./types";
@@ -10,8 +10,12 @@ import { ConfirmationModal } from "../../components/confirmationModal";
 import { usePlayers } from "../Player/api";
 import { toast } from "react-toastify";
 import { MatchForm } from "./match";
+import { GlobalNavbar } from "../../components/navbar";
+import { Player } from "../Player/types";
 
 export const Teams = () => {
+  const navigate = useNavigate();
+
   const { teams, loading, saveTeams, updateTeams, saving, deleteTeam, deleting } = useTeams()
   const { players } = usePlayers()
   const [localTeams, setLocalTeams] = useState<Team[]>([]);
@@ -25,7 +29,7 @@ export const Teams = () => {
   const addTeam = () => {
     const maxTeamNumber = players.length / matchDetail.playerNumber
     if (maxTeamNumber < localTeams.length) return toast.warn('Not enough players to add more team')
-    setLocalTeams([...localTeams, { id: Date.now().toString(), name: "" }]);
+    setLocalTeams([...localTeams, { id: Date.now().toString(), name: "", players: [] }]);
   };
 
   const handleChange = (id: string, field: string, value: string | number) => {
@@ -33,6 +37,26 @@ export const Teams = () => {
       teams.id === id ? { ...teams, [field]: value } : teams
     ));
   };
+
+  const distributePlayers = async () => {
+    // Sort players by skill level
+    players.sort((a, b) => b.skill - a.skill);
+
+    const teamAssignments: Team[] = teams.map(team => ({ ...team, players: [] }));
+
+    for (const player of players) {
+      teamAssignments.sort((a, b) =>
+        (a.players?.reduce((sum: number, p: Player) => sum + p.skill, 0) || 0) -
+        (b.players?.reduce((sum: number, p: Player) => sum + p.skill, 0) || 0)
+      );
+
+      teamAssignments[0].players?.push(player);
+    }
+
+    await updateTeams(teamAssignments)
+    navigate('/generated-teams')
+  }
+
 
   const handleSubmit = async () => {
     const newTeams = localTeams.filter(
@@ -63,49 +87,57 @@ export const Teams = () => {
   return (
     <div>
       <div className='d-flex justify-content-center mb-5'>
-        <h2 className="font-bold text-lg mb-2">Teams</h2>
+        <div>
+          <h2 className="font-bold text-lg mb-2">Teams</h2>
 
-        {localTeams.map((team: Team) => (
-          <div key={team.id} className="btn-toolbar mb-3">
-            <TextInput
-              value={team.name}
-              onChange={({ target }: { target: { value: string } }) =>
-                handleChange(team.id, "name", target.value)
-              }
-              handleDelete={() => { setDeletingTeam(team.id) }}
-            />
+          {localTeams.map((team: Team) => (
+            <div key={team.id} className="btn-toolbar mb-3">
+              <TextInput
+                value={team.name}
+                onChange={({ target }: { target: { value: string } }) =>
+                  handleChange(team.id, "name", target.value)
+                }
+                handleDelete={() => { setDeletingTeam(team.id) }}
+              />
+            </div>
+          ))}
+
+          <div className="d-flex">
+            <Button
+              className="btn btn-primary mx-5"
+              onClick={addTeam}
+            >
+              ({localTeams.length}) Add Team
+            </Button>
+
+            <Button
+              className="btn btn-success"
+              onClick={handleSubmit}
+              disabled={saving}
+            >
+              {saving ? "Saving..." : "Save Teams"}
+            </Button>
           </div>
-        ))}
 
-        <div className="d-flex">
-          <Button
-            className="btn btn-primary mx-5"
-            onClick={addTeam}
-          >
-            ({localTeams.length}) Add Team
-          </Button>
+          {teams.length
+            ? <Button className="btn btn-warning my-5" onClick={() => { distributePlayers() }} >
+              Generate Teams
+            </Button>
+            : ''
+          }
 
-          <Button
-            className="btn btn-success"
-            onClick={handleSubmit}
-            disabled={saving}
-          >
-            {saving ? "Saving..." : "Save Teams"}
-          </Button>
+          {deletingTeam &&
+            <ConfirmationModal
+              show={!!deletingTeam}
+              title="Deleting Team"
+              text="Are you sure to delete the Team ? You can't retrive data once you delete."
+              onClose={() => setDeletingTeam(null)}
+              onSave={() => {
+                deleteTeam(deletingTeam as string);
+                setDeletingTeam(null);
+              }}
+            />}
         </div>
-
-        {deletingTeam &&
-          <ConfirmationModal
-            show={!!deletingTeam}
-            title="Deleting Team"
-            text="Are you sure to delete the Team ? You can't retrive data once you delete."
-            onClose={() => setDeletingTeam(null)}
-            onSave={() => {
-              deleteTeam(deletingTeam as string);
-              setDeletingTeam(null);
-            }}
-          />}
-
       </div>
     </div>
   )

@@ -61,7 +61,7 @@ export const useTeams = () => {
           return;
         }
 
-        await updateDoc(teamRef, { name: team.name });
+        await updateDoc(teamRef, { name: team.name, players: team.players || [] });
         console.log(`team ${team.id} updated successfully!`);
       });
 
