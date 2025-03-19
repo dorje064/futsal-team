@@ -67,26 +67,36 @@ export const PlayerList = () => {
         </div>
       ))}
 
-      <button className="bg-blue-500 text-white px-4 py-2 rounded mt-2" onClick={addPlayer}>
-        ({localPlayers.length}) Add Player
-      </button>
+      <div className="d-flex">
+        <button
+          type="button"
+          className="btn btn-primary mx-5"
+          onClick={addPlayer}
+        >
+          ({localPlayers.length}) Add Player
+        </button>
 
-      <button
-        className="bg-green-500 text-white px-4 py-2 rounded mt-2"
-        onClick={handleSubmit}
-        disabled={saving}
-      >
-        {saving ? "Saving..." : "Save Players"}
-      </button>
+        <button
+          type="button"
+          className="btn btn-success"
+          onClick={handleSubmit}
+          disabled={saving}
+        >
+          {saving ? "Saving..." : "Save Players"}
+        </button>
+      </div>
 
-      <ConfirmationModal
-        isOpen={!!deletingPlayer}
-        onClose={() => setDeletingPlayer(null)}
-        onConfirm={() => {
-          deletePlayer(deletingPlayer as string);
-          setDeletingPlayer(null);
-        }}
-      />
+      {deletingPlayer &&
+        <ConfirmationModal
+          show={!!deletePlayer}
+          title="Deleting Player"
+          text="Are you sure to delete the Player ? You can't retrive data once your delete "
+          onClose={() => setDeletingPlayer(null)}
+          onSave={() => {
+            deletePlayer(deletingPlayer as string);
+            setDeletingPlayer(null);
+          }}
+        />}
     </div>
   );
 };
