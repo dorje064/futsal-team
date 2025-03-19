@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import Button from 'react-bootstrap/Button'
 import { useNavigate } from "react-router-dom";
 
-
 import { useTeams } from "./api"
 import { Team } from "./types";
 import { TextInput } from "../../components/input";
@@ -15,7 +14,7 @@ import { Player } from "../Player/types";
 export const Teams = () => {
   const navigate = useNavigate();
 
-  const { teams, loading, saveTeams, updateTeams, saving, deleteTeam, deleting } = useTeams()
+  const { teams, loading, saveTeams, updateTeams, saving, deleteTeam } = useTeams()
   const { players } = usePlayers()
   const [localTeams, setLocalTeams] = useState<Team[]>([]);
   const [deletingTeam, setDeletingTeam] = useState<string | null>()
