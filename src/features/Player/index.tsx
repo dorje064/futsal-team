@@ -4,7 +4,6 @@ import { SkillInput, TextInput } from "../../components/input";
 import { usePlayers } from "./api";
 import { Player } from "./types";
 import { ConfirmationModal } from "../../components/confirmationModal";
-import { GlobalNavbar } from "../../components/navbar";
 
 export const PlayerList = () => {
   const { players, loading, savePlayers, updatePlayers, saving, deletePlayer } = usePlayers();

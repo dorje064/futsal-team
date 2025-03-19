@@ -10,7 +10,6 @@ import { ConfirmationModal } from "../../components/confirmationModal";
 import { usePlayers } from "../Player/api";
 import { toast } from "react-toastify";
 import { MatchForm } from "./match";
-import { GlobalNavbar } from "../../components/navbar";
 import { Player } from "../Player/types";
 
 export const Teams = () => {
