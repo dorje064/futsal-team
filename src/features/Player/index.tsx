@@ -46,7 +46,7 @@ export const PlayerList = () => {
   if (loading) return <p>Loading players...</p>;
 
   return (
-    <div className="px-auto">
+    <div className='d-flex justify-content-center mb-5'>
       <h2 className="font-bold text-lg mb-2">Players</h2>
 
       {localPlayers.map((player: Player) => (

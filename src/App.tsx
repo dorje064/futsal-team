@@ -5,6 +5,7 @@ import { PlayerList } from './features/Player'
 import { ToastContainer } from "react-toastify";
 import Button from 'react-bootstrap/Button';
 import { Teams } from './features/Team';
+import { GlobalNavbar } from './components/navbar';
 
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
   return (
     <>
       <ToastContainer position="top-right" autoClose={3000} />
+      <GlobalNavbar content={<>hello</>} />
       <div className='d-flex justify-content-center mb-5'>
         {/* <PlayerList /> */}
         <Teams />
